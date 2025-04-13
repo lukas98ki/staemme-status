@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Spielstatus</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 1em;
+      background: #f9f9f9;
+    }
+    h1 {
+      font-size: 1.5em;
+    }
+    .status-box {
+      background: white;
+      padding: 1em;
+      border-radius: 10px;
+      margin-bottom: 1em;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 0.5em;
+    }
+    select {
+      width: 100%;
+      padding: 0.5em;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Spielstatus</h1>
+  <div class="status-box">
+    <div id="statusDisplay"></div>
+  </div>
+
+  <div class="status-box">
+    <h2>Update deinen Status</h2>
+    <label>Spieler:
+      <select id="playerSelect">
+        <option value="spieler1">Spieler 1</option>
+        <option value="spieler2">Spieler 2</option>
+        <option value="spieler3">Spieler 3</option>
+      </select>
+    </label>
+    <label>Status:
+      <select id="statusSelect">
+        <option value="wartet">Wartet</option>
+        <option value="app">In App</option>
+        <option value="browser">Im Browser</option>
+      </select>
+    </label>
+    <button onclick="updateStatus()">Speichern</button>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+  apiKey: "AIzaSyCFjfhp8xXdtedJm8-jrJPQjFapyLik4v4",
+  authDomain: "staemmetimetable.firebaseapp.com",
+  databaseURL: "https://staemmetimetable-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "staemmetimetable",
+  storageBucket: "staemmetimetable.firebasestorage.app",
+  messagingSenderId: "234190744347",
+  appId: "1:234190744347:web:41b89a7721214f451381be",
+  measurementId: "G-1W6GTELMG0"
+};
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function updateStatus() {
+      const player = document.getElementById("playerSelect").value;
+      const status = document.getElementById("statusSelect").value;
+      db.ref("status/" + player).set(status);
+    }
+
+    function refreshDisplay(snapshot) {
+      const data = snapshot.val();
+      let html = "";
+      for (const player of ["spieler1", "spieler2", "spieler3"]) {
+        const status = data?.[player] || "wartet";
+        html += `<p><strong>${player}:</strong> ${status}</p>`;
+      }
+      document.getElementById("statusDisplay").innerHTML = html;
+    }
+
+    db.ref("status").on("value", refreshDisplay);
+  </script>
+</body>
+</html>
