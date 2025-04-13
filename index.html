@@ -30,6 +30,14 @@
       padding: 0.5em;
       border-radius: 5px;
     }
+    #log {
+      font-size: 0.9em;
+      color: #444;
+      max-height: 200px;
+      overflow-y: auto;
+      border-top: 1px solid #ccc;
+      padding-top: 0.5em;
+    }
   </style>
 </head>
 <body>
@@ -57,6 +65,11 @@
     <button onclick="updateStatus()">Speichern</button>
   </div>
 
+  <div class="status-box">
+    <h2>Aktivitäts-Log (Heute)</h2>
+    <div id="log"></div>
+  </div>
+
   <script>
     const firebaseConfig = {
   apiKey: "AIzaSyCFjfhp8xXdtedJm8-jrJPQjFapyLik4v4",
@@ -76,6 +89,12 @@
       const player = document.getElementById("playerSelect").value;
       const status = document.getElementById("statusSelect").value;
       db.ref("status/" + player).set(status);
+
+      const now = new Date();
+      const timestamp = now.toTimeString().split(" ")[0];
+      const today = now.toISOString().split("T")[0];
+      const logEntry = `${timestamp} – ${player} → ${status}`;
+      db.ref("log/" + today).push(logEntry);
     }
 
     function refreshDisplay(snapshot) {
@@ -88,7 +107,25 @@
       document.getElementById("statusDisplay").innerHTML = html;
     }
 
+    function refreshLog(snapshot) {
+      const logs = snapshot.val();
+      const container = document.getElementById("log");
+      container.innerHTML = "";
+      if (logs) {
+        const entries = Object.values(logs);
+        entries.forEach(entry => {
+          const p = document.createElement("p");
+          p.textContent = entry;
+          container.appendChild(p);
+        });
+      } else {
+        container.textContent = "Noch keine Aktionen heute.";
+      }
+    }
+
+    const today = new Date().toISOString().split("T")[0];
     db.ref("status").on("value", refreshDisplay);
+    db.ref("log/" + today).on("value", refreshLog);
   </script>
 </body>
 </html>
