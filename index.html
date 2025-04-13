@@ -50,9 +50,9 @@
     <h2>Update deinen Status</h2>
     <label>Spieler:
       <select id="playerSelect">
-        <option value="spieler1">Markus</option>
-        <option value="spieler2">Sascha</option>
-        <option value="spieler3">Lukas</option>
+        <option value="markus">Markus</option>
+        <option value="sascha">Sascha</option>
+        <option value="lukas">Lukas</option>
       </select>
     </label>
     <label>Status:
@@ -100,7 +100,7 @@
     function refreshDisplay(snapshot) {
       const data = snapshot.val();
       let html = "";
-      for (const player of ["spieler1", "spieler2", "spieler3"]) {
+      for (const player of ["markus", "sascha", "lukas"]) {
         const status = data?.[player] || "wartet";
         html += `<p><strong>${player}:</strong> ${status}</p>`;
       }
